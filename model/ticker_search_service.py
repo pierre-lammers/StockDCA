@@ -1,4 +1,5 @@
 from yahooquery import search
+from functools import lru_cache
 
 class TickerSearchService:
     """
@@ -6,6 +7,7 @@ class TickerSearchService:
     """
 
     @staticmethod
+    @lru_cache(maxsize=50)
     def search_ticker(query: str):
         """
         Searches for stock tickers based on the company name using yahooquery.

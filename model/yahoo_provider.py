@@ -27,8 +27,10 @@ class YahooProvider:
         if ticker in self.cache:
             return self.cache[ticker]
 
-        # Download historical data
-        data = yf.download(ticker, start="2000-01-03")
+        # Download all available historical data
+        data = yf.download(ticker)
+
+        # Create a Stock object
         stock = Stock(ticker=ticker, data=data)
 
         # Cache the Stock object

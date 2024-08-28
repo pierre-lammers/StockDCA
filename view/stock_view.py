@@ -1,5 +1,7 @@
 import streamlit as st
 from model.ticker_search_service import TickerSearchService
+from model.yahoo_provider import YahooProvider
+from logger import get_logger
 import pandas as pd
 
 class StockView:
@@ -13,6 +15,7 @@ class StockView:
 
     def __init__(self):
         st.title("Stock DCA Performance")
+        self.logger = get_logger(__name__)
 
     def display_dca_results(self, dca_results: pd.DataFrame):
         """
@@ -35,6 +38,7 @@ class StockView:
         company_name = st.text_input("Enter company name:")
 
         ticker = None
+        start_date = None
         if company_name:
             # Search for tickers matching the company name
             results = TickerSearchService.search_ticker(company_name)
@@ -42,11 +46,17 @@ class StockView:
                 # Let the user select the correct ticker
                 selected = st.selectbox("Select the correct ticker:", results, format_func=lambda x: f"{x[1]} ({x[0]})")
                 ticker = selected[0]
+
+                # Fetch stock data to determine the first available date
+                stock = YahooProvider().get_stock(ticker)
+                first_available_date = stock.data.index.min()
+                self.logger.info(f"Start date of the company {company_name} is {first_available_date}")
+                start_date = st.date_input("Start date for DCA calculation:", value=first_available_date, min_value=first_available_date, max_value=pd.Timestamp.today())
+
             else:
                 st.warning("No matching companies found.")
 
         investment = st.number_input("Investment amount per interval ($):", min_value=1.0, value=100.0)
-        start_date = st.date_input("Start date for DCA calculation:", value=pd.Timestamp("2010-01-03"))
         frequency = st.selectbox("Investment frequency:", ["daily", "weekly", "monthly"])
 
         # Display the custom interval input only if 'daily' is selected
