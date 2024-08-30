@@ -8,7 +8,7 @@ class StockAnalyzer:
         self.stock = stock
         self.logger = get_logger(__name__)
 
-    def calculate_dca(self, investment: float, start_date: pd.Timestamp, frequency: str = 'monthly', custom_interval: int = None) -> pd.DataFrame:
+    def calculate_dca(self, investment: float, start_date: pd.Timestamp, frequency: str = 'monthly', custom_interval: int = None, fee: float = 0.0) -> pd.DataFrame:
         # Retrieve the stock data (assumed to be already sorted by index)
         data = self.stock.data
 
@@ -41,7 +41,13 @@ class StockAnalyzer:
 
         # Vectorized computation of shares purchased and cumulative investment
         prices = data.loc[investment_dates, 'Close']
-        shares_purchased = investment / prices
+        
+        # Adjust the investment amount by subtracting the fee
+        adjusted_investment = investment - fee
+        if adjusted_investment <= 0:
+            raise ValueError("Investment amount after fees must be greater than zero.")
+        
+        shares_purchased = adjusted_investment / prices
         cumulative_investment = investment * np.arange(1, len(shares_purchased) + 1)
         portfolio_value = shares_purchased.cumsum() * prices
 
@@ -49,7 +55,8 @@ class StockAnalyzer:
         records = pd.DataFrame({
             'Cumulative Investment': cumulative_investment,
             'Shares Purchased': shares_purchased,
-            'Portfolio Value': portfolio_value
+            'Portfolio Value': portfolio_value,
+            'Fees Paid': fee * np.arange(1, len(shares_purchased) + 1)  # Keep track of total fees paid
         }, index=investment_dates)
 
         return records

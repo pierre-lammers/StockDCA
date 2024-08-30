@@ -25,7 +25,7 @@ class StockController:
         """
 
         # Get user inputs from the view
-        ticker, investment, start_date, frequency, custom_interval = self.view.get_user_inputs()
+        ticker, investment, start_date, frequency, custom_interval, fee = self.view.get_user_inputs()
 
         self.logger.info(f"User selected parameters: Ticker={ticker}, Investment=${investment}, Start Date={start_date}, Frequency={frequency}, Custom Interval={custom_interval} days")
 
@@ -37,7 +37,7 @@ class StockController:
             analyzer = StockAnalyzer(stock)
 
             # Calculate DCA based on user input
-            dca_results = analyzer.calculate_dca(investment, start_date, frequency, custom_interval)
+            dca_results = analyzer.calculate_dca(investment, start_date, frequency, custom_interval, fee)
 
             # Calculate the total investment, current portfolio value, and percentage increase
             total_investment = dca_results['Cumulative Investment'].iloc[-1]
@@ -49,10 +49,7 @@ class StockController:
             self.logger.info(f"Current Portfolio Value: ${current_portfolio_value:.2f}")
             self.logger.info(f"Percentage Increase: {percentage_increase:.2f}%")
 
-            # Display the results in the view
-            self.view.display_dca_results(dca_results)
-
             # Display additional metrics
-            self.view.display_additional_metrics(total_investment, current_portfolio_value, percentage_increase)
+            self.view.display_dca_results_and_metrics(dca_results, total_investment, current_portfolio_value, percentage_increase)
 
         
