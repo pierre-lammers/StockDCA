@@ -1,25 +1,21 @@
+from dataclasses import dataclass
 import pandas as pd
-from model.stock import Stock
-from logger import get_logger
 import numpy as np
+from model.stock import Stock
+import streamlit as st
 
+@dataclass
 class StockAnalyzer:
-    def __init__(self, stock: Stock):
-        self.stock = stock
-        self.logger = get_logger(__name__)
-
-    def calculate_dca(self, investment: float, start_date: pd.Timestamp, frequency: str = 'monthly', custom_interval: int = None, fee: float = 0.0) -> pd.DataFrame:
+    
+    @staticmethod
+    def calculate_dca(stock: Stock, investment: float, start_date: pd.Timestamp, frequency: str = 'monthly', custom_interval: int = None, fee: float = 0.0) -> pd.DataFrame:
         # Retrieve the stock data (assumed to be already sorted by index)
-        data = self.stock.data
-
-        self.logger.info(f"Start date: {start_date}")
-        self.logger.info(f"Data from start_date: {data.loc[start_date:]}")
+        data = stock.data
 
         # Check if start_date exists in the data
         if start_date not in data.index:
             nearest_date = data.index[data.index.get_indexer([start_date], method='pad')][0]
             start_date = nearest_date
-            self.logger.warning(f"Start date adjusted to the nearest available date before or equal to the given date: {start_date}")
 
         # Define the interval based on the frequency or custom interval
         if custom_interval:
@@ -59,4 +55,5 @@ class StockAnalyzer:
             'Fees Paid': fee * np.arange(1, len(shares_purchased) + 1)  # Keep track of total fees paid
         }, index=investment_dates)
 
+        # Return the DCA records and the new row to be added to the portfolio
         return records

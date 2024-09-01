@@ -97,7 +97,7 @@ class StockView:
     def display_dca_results_and_metrics(
         self,
         dca_results: pd.DataFrame,
-        total_investment,
+        dca_array : pd.DataFrame,
         current_portfolio_value,
         percentage_increase,
     ):
@@ -122,3 +122,11 @@ class StockView:
             f"{formatted_value} $",
             f"{formatted_percentage}%",
         )
+        
+        # Display the DCA results table, using st.container to ensure full width
+        st.write("### DCA Results")
+        with st.container():
+            st.dataframe(
+                dca_array,
+                use_container_width=True  # This ensures the dataframe uses full container width
+            )

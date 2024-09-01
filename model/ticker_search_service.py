@@ -1,13 +1,13 @@
 from yahooquery import search
-from functools import lru_cache
+import streamlit as st
 
 class TickerSearchService:
     """
     Service class to handle searching for stock tickers based on company names using the yahooquery API.
     """
-
+    
+    @st.cache_data
     @staticmethod
-    @lru_cache(maxsize=50)
     def search_ticker(query: str):
         """
         Searches for stock tickers based on the company name using yahooquery.
