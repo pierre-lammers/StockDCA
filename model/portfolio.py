@@ -1,18 +1,28 @@
 from dataclasses import dataclass, field
 import pandas as pd
 
-
 @dataclass
 class Portfolio:
     """
     The Portfolio class is responsible for storing and managing the results of multiple DCA simulations.
     """
 
-    results_df: pd.DataFrame = field(
-        default_factory=lambda: pd.DataFrame(
-            columns=["Company", "Start Date", "Frequency", "Percentage Increase"]
-        )
-    )
+    # Define columns as an instance variable
+    COLUMNS: list = field(default_factory=lambda: [
+        "Company",
+        "Start Date",
+        "Investment",
+        "Frequency",
+        "Custom Interval",
+        "Fee",
+        "Percentage Increase",
+    ])
+
+    results_df: pd.DataFrame = field(init=False)
+
+    def __post_init__(self):
+        # Initialize the results_df DataFrame with the defined columns
+        self.results_df = pd.DataFrame(columns=self.COLUMNS)
 
     def add_simulation_result(
         self,
@@ -41,17 +51,7 @@ class Portfolio:
         self.results_df = pd.concat([self.results_df, new_row], ignore_index=True)
 
         # Reorder the columns to ensure the specified order
-        self.results_df = self.results_df[
-            [
-                "Company",
-                "Start Date",
-                "Investment",
-                "Frequency",
-                "Custom Interval",
-                "Fee",
-                "Percentage Increase",
-            ]
-        ]
+        self.results_df = self.results_df[self.COLUMNS]
 
     def get_results(self) -> pd.DataFrame:
         """
@@ -63,6 +63,4 @@ class Portfolio:
         """
         Clear all results from the portfolio.
         """
-        self.results_df = pd.DataFrame(
-            columns=["Company", "Start Date", "Frequency", "Percentage Increase"]
-        )
+        self.results_df = pd.DataFrame(columns=self.COLUMNS)
