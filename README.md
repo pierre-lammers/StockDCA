@@ -26,9 +26,18 @@ To get started with StockDCA, you need to have Python installed on your machine.
     source venv/bin/activate   # On Windows: venv\Scripts\activate
     ```
 
-## Usage
+    ```VSCode
+    open the command palette (ctrl + shift + P) and  create a .venv folder in your project workspace: 
+        > Python: Create Environment => Venv 
+    ```
 
+## Usage
 To run the application, execute the following command in your terminal:
 
 ```bash
 streamlit run StreamlitApp.py
+```
+
+```VSCode
+run "Python: Streamlit" configuration in VSCode
+```
